@@ -16,6 +16,11 @@ app.configure(function() {
   app.use(express.favicon());
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
+  app.use(require('faceplate').middleware({
+    app_id: process.env.FACEBOOK_APP_ID || '260510290719654',
+    secret: process.env.FACEBOOK_SECRET || 'f7a9e6ee38d5c2f821fc4c0385f87f4d',
+    scope: 'user_likes'
+  }));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express['static'](__dirname + '/public'));
@@ -33,6 +38,37 @@ app.configure('production', function() {
 
 // Express routes
 app.get('/', routes.index);
+
+app.get('/friends', function(req, res) {
+  if(!req.facebook) {
+    res.render('appauth', {title: 'Authentication'});
+  } else {
+    req.facebook.get('/me/friends', { limit: 4 }, function(friends) {
+      res.send('friends: ' + require('util').inspect(friends));
+    });
+  }
+});
+
+app.post('/friends', function(req, res) {
+  if(!req.facebook) {
+    res.render('appauth', {title: 'Authentication'});
+  } else {
+    req.facebook.get('/me/friends', { limit: 4 }, function(friends) {
+      res.send('friends: ' + require('util').inspect(friends));
+    });
+  }
+});
+
+// See the full signed request details
+app.get('/signed_request', function(req, res) {
+  console.log("RECEIVED REQUEST THROUGH FACEBOOK");
+  console.log(req.facebook.signed_request);
+  res.send('Signed Request details: ' + require('util').inspect(req.facebook.signed_request));
+});
+
+app.post('/signed_request', function(req, res) {
+  res.send('Signed Request details: ' + require('util').inspect(req.facebook.signed_request));
+});
 
 // Create server and initialize socket.io
 var server = http.createServer(app);

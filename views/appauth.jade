@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  script(type='text/javascript')
+    var oauth_url = 'https://www.facebook.com/dialog/oauth/';
+    oauth_url += '?client_id=260510290719654';
+    oauth_url += '&redirect_uri=' + encodeURIComponent('http://localhost:1337/friends');
+    oauth_url += '&scope=user_likes'
+
+    window.top.location = oauth_url;
