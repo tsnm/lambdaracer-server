@@ -1,8 +1,27 @@
 body {
-  padding: 50px;
+  padding: 0;
+  margin: 0;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
+}
+
+#wrap {
+  width: 809px;
+  height: 1014px;
+  border: 1px solid black;
+  background: url('/images/arcade_bg.png') no-repeat top left;
+}
+
+#wrap #racer {
+  margin-left: 0;
+  position: relative;
+  top: 29px;
+  left: 100px;
+}
+
+#fps {
+  display: none;
 }
