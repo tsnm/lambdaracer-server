@@ -22,7 +22,7 @@ var roadWidth      = 2000;                    // actually half the roads width, 
 var segmentLength  = 200;                     // length of a single segment
 var rumbleLength   = 3;                       // number of segments per red/white rumble strip
 var trackLength    = null;                    // z length of entire track (computed)
-var lanes          = 3;                       // number of lanes
+var lanes          = 6;                       // number of lanes
 var fieldOfView    = 100;                     // angle (degrees) for field of view
 var cameraHeight   = 1000;                    // z height of camera
 var cameraDepth    = null;                    // z distance camera is from screen (computed)
@@ -125,8 +125,13 @@ function update(dt) {
     if (currentLapTime && (startPosition < playerZ)) {
       lastLapTime    = currentLapTime;
       currentLapTime = 0;
+
+      // lambdaracer server connection
+      updateScoreOnServer(lastLapTime);
+
       if (lastLapTime <= Util.toFloat(Dom.storage.fast_lap_time)) {
         Dom.storage.fast_lap_time = lastLapTime;
+
         updateHud('fast_lap_time', formatTime(lastLapTime));
         Dom.addClassName('fast_lap_time', 'fastest');
         Dom.addClassName('last_lap_time', 'fastest');

@@ -4,12 +4,9 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/common.css')
-    script(src='/socket.io/socket.io.js')
-    script(type='text/javascript')
-      var socket = io.connect('http://localhost:1337');
-      socket.on('news', function (data) {
-        console.log(data);
-        socket.emit('my other event', { my: 'data' });
-      });
+
+    script!= javascript
+    block scripts
+
   body
     block content
