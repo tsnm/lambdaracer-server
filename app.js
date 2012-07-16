@@ -143,13 +143,11 @@ io.sockets.on('connection', function (socket) {
   socket.emit('init', { numberOfPlayers: 10 });
 
   socket.on('init', function (data) {
-    socket.emit('test', { receivedData: data, mongooseErr: errOnMongoose });
     socket.set('fbid', data.fbid, function() {
       addPlayerToSocket(data.fbid, socket, function (err, player) {
         if(err) {
           socket.emit('error');
         } else {
-          socket.emit('test', { msg: "done adding player to socket", err: err, player: player });
           socket.emit('ready');
         }
       });
@@ -169,7 +167,6 @@ io.sockets.on('connection', function (socket) {
             if(err) {
               socket.emit('error');
             } else {
-              socket.emit('test', { playerToSocket: 'added player to socket' });
               player.time = data.lapTime;
               player.save();
             }
@@ -184,10 +181,8 @@ io.sockets.on('connection', function (socket) {
 });
 
 var addPlayerToSocket = function(fbid, socket, callback) {
-  socket.emit('test', { msg: "entered addPlayerToSocket", fbid: fbid });
   Player.findOne({fbid: fbid}, function(error, player) {
     var currentPlayer = player;
-    socket.emit('test', { msg: "in findOne callback", error: error, player: player });
 
     if(error) { // emit error to client
       callback({err: 'there was an error'}, undefined);
@@ -195,14 +190,9 @@ var addPlayerToSocket = function(fbid, socket, callback) {
     }
 
     if(currentPlayer === null) { // no player by that fbid in db yet, create one
-      socket.emit('test', { msg: "currentPlayer was created and hopefully saved before", currentPlayer: currentPlayer });
-
       currentPlayer = new Player({ fbid: fbid, time: 0 }).save(function (err) {
-        console.log("errror while saving player");
-        socket.emit('test', { msg: "error while saving player to db", error: err });
+        callback({err: 'there was an error'}, undefined);
       });
-
-      socket.emit('test', { msg: "currentPlayer was created and hopefully saved after", currentPlayer: currentPlayer });
     }
 
     socket.set('player', currentPlayer, function() {
