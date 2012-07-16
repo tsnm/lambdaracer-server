@@ -1,4 +1,4 @@
-var socket = io.connect('http:'+lambdaracer.current.host_url);
+var socket = io.connect(lambdaracer.current.host_url);
 
 socket.on('connect', function (data) {
   console.log("we have a connect!");

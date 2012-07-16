@@ -16,7 +16,8 @@ var Player = require('./models/player.js');
 var app = express();
 
 // Environment-specific URLs
-var host_url,
+var host_url, host_url_protocol,
+    redirect_url, redirect_url_protocol,
     db_url;
 
 // Express configuration
@@ -43,6 +44,7 @@ app.configure(function() {
 app.configure('development', function() {
   host_url = "//localhost:1338/";
   db_url = "mongodb://localhost/lambdaracer";
+  redirect_url = "//localhost:1338/";
   app.use(express.errorHandler());
 });
 
@@ -50,6 +52,7 @@ app.configure('development', function() {
 app.configure('production', function() {
   host_url = "//lambda-racer.jit.su/";
   db_url = "mongodb://tsnm:TsuNaMi@flame.mongohq.com:27047/lambdaracer";
+  redirect_url = "//www.facebook.com/lambda.maximal/app_260510290719654";
   app.use(express.errorHandler());
 });
 
@@ -57,12 +60,15 @@ app.configure('production', function() {
 var setAppUrl = function (req, res, next) {
   if(req.connection.encrypted) {
     host_url_protocol = 'https:' + host_url;
+    redirect_url_protocol = 'https:' + redirect_url;
   } else {
     host_url_protocol = 'http:' + host_url;
+    redirect_url_protocol = 'http:' + redirect_url;
   }
 
   // Expose host_url to views
-  app.expose({ host_url: host_url_protocol }, 'lambdaracer.current');
+  app.expose({ host_url: host_url_protocol }, 'lambdaracer.current'); // FIX, is in the code multiple times
+  app.expose({ redirect_url: redirect_url_protocol }, 'lambdaracer.current'); // FIX, is in the code multiple times
 
   next();
 };
