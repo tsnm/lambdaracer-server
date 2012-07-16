@@ -1,21 +1,24 @@
 {
   "name": "lambdaracer-server",
-  "version": "0.0.1",
+  "version": "0.0.1-31",
   "private": true,
+  "subdomain": "lambda-racer",
+  "author": "tsnm <tsnm.at.kllr@googlemail.com>",
   "scripts": {
-    "start": "node app"
+    "start": "node app.js"
   },
   "dependencies": {
-    "express":        "3.0.0beta4",
-    "mongoose":       "2.7.1",
-    "jade":           "0.26.3",
+    "express": "3.0.0beta4",
+    "mongoose": "2.7.1",
+    "jade": "0.26.3",
     "express-expose": "https://github.com/visionmedia/express-expose/tarball/master",
-    "socket.io":      "0.9.6",
-    "less":           "1.3.0",
-    "faceplate":      "https://github.com/hiattp/faceplate/tarball/master"
+    "socket.io": "0.9.6",
+    "less": "1.3.0",
+    "faceplate": "https://github.com/hiattp/faceplate/tarball/master"
   },
   "engines": {
-    "node": "0.8.x",
-    "npm":  "1.1.x"
-  }
+    "node": "0.6.x",
+    "npm": "1.1.x"
+  },
+  "analyze": false
 }
