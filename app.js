@@ -126,7 +126,7 @@ io.sockets.on('connection', function (socket) {
     socket.set('fbid', data.fbid, function () {
       addPlayerToSocket(data.fbid, data.name, socket, function (err, player) {
         if(err) {
-          socket.emit('error');
+          socket.emit('error', { err: err.err });
         } else {
           //socket.broadcast('player connected', { name: player.name  });
           socket.emit('ready');
@@ -140,12 +140,12 @@ io.sockets.on('connection', function (socket) {
       if(err) {
         socket.get('fbid', function (err, fbid) {
           if(err || fbid === null) {
-            socket.emit('error');
+            socket.emit('error', { err: err });
           }
 
           addPlayerToSocket(fbid, socket, function (err, player) {
             if(err) {
-              socket.emit('error');
+              socket.emit('error', { err: err.err });
             } else {
               player.time = data.lapTime;
               player.save();
@@ -165,13 +165,13 @@ var addPlayerToSocket = function(fbid, name, socket, callback) {
     var currentPlayer = player;
 
     if(error) { // emit error to client
-      callback({err: 'there was an error'}, undefined);
+      callback({err: 'there was an error for Player.findOne()'}, undefined);
       return;
     }
 
     if(currentPlayer === null) { // no player by that fbid in db yet, create one
       currentPlayer = new Player({ fbid: fbid, name: name, time: 0 }).save(function (err) {
-        callback({err: 'there was an error'}, undefined);
+        callback({err: 'there was an error for new Player().save()'}, undefined);
       });
     }
 
