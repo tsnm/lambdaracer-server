@@ -5,8 +5,8 @@ var mongoose = require('mongoose'),
 
 var playerSchema = new Schema({
   fbid: { type: String, 'default': "" },
-  time: { type: Number, 'default': 0 },
-  name: { type: String, 'default': "Noname"}
+  time: { type: Number, 'default': 0  },
+  name: { type: String, 'default': "" }
 });
 
 module.exports = mongoose.model('Player', playerSchema);

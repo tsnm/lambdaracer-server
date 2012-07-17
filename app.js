@@ -21,7 +21,7 @@ var host_url, host_url_protocol,
     db_url;
 
 // Express configuration
-app.configure(function() {
+app.configure(function () {
   app.set('port', process.env.PORT || 1338);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
@@ -41,7 +41,7 @@ app.configure(function() {
 });
 
 // Development environment
-app.configure('development', function() {
+app.configure('development', function () {
   host_url = "//localhost:1338/";
   db_url = "mongodb://localhost/lambdaracer";
   redirect_url = "//localhost:1338/";
@@ -49,7 +49,7 @@ app.configure('development', function() {
 });
 
 // Production environment
-app.configure('production', function() {
+app.configure('production', function () {
   host_url = "//lambda-racer.jit.su/";
   db_url = "mongodb://tsnm:TsuNaMi@flame.mongohq.com:27047/lambdaracer";
   redirect_url = "//www.facebook.com/lambda.maximal/app_260510290719654";
@@ -77,38 +77,18 @@ var setAppUrl = function (req, res, next) {
 app.get('/', setAppUrl, routes.index);
 app.post('/', setAppUrl, routes.index);
 
-app.get('/friends', function(req, res) {
-  if(!req.facebook) {
-    res.render('appauth', {title: 'Authentication'});
-  } else {
-    req.facebook.get('/me/friends', { limit: 4 }, function(friends) {
-      res.send('friends: ' + require('util').inspect(friends));
-    });
-  }
-});
-
-app.post('/friends', function(req, res) {
-  if(!req.facebook) {
-    res.render('appauth', {title: 'Authentication'});
-  } else {
-    req.facebook.get('/me/friends', { limit: 4 }, function(noclue, friends) {
-      res.send('friends: ' + require('util').inspect(friends));
-    });
-  }
-});
-
 // See the full signed request details
-app.get('/signed_request', function(req, res) {
+app.get('/signed_request', function (req, res) {
   res.send('Signed Request details: ' + require('util').inspect(req.facebook.signed_request));
 });
 
-app.post('/signed_request', function(req, res) {
+app.post('/signed_request', function (req, res) {
   res.send('Signed Request details: ' + require('util').inspect(req.facebook.signed_request));
 });
 
 var errOnMongoose;
 // initialize DB
-mongoose.connect(db_url, function(err) {
+mongoose.connect(db_url, function (err) {
   errOnMongoose = err;
 });
 
@@ -123,7 +103,7 @@ var io = require('socket.io').listen(server);
 //});
 
 // Compatibility for nodejitsu
-io.configure('production', function() {
+io.configure('production', function () {
   io.enable('browser client minification');  // send minified client
 //  io.enable('browser client etag');          // apply etag caching logic based on version number
   io.enable('browser client gzip');          // gzip the file
@@ -140,25 +120,25 @@ io.set('transports', [
 
 // Events to monitor
 io.sockets.on('connection', function (socket) {
-  socket.emit('init', { numberOfPlayers: 10 });
+  socket.emit('init');
 
   socket.on('init', function (data) {
-    socket.set('fbid', data.fbid, function() {
-      addPlayerToSocket(data.fbid, socket, function (err, player) {
+    socket.set('fbid', data.fbid, function () {
+      addPlayerToSocket(data.fbid, data.name, socket, function (err, player) {
         if(err) {
           socket.emit('error');
         } else {
+          //socket.broadcast('player connected', { name: player.name  });
           socket.emit('ready');
         }
       });
     });
   });
 
-  socket.on('update laptime', function(data) {
-    console.log("UPDATE LAPTIME");
-    socket.get('player', function(err, player) {
+  socket.on('update laptime', function (data) {
+    socket.get('player', function (err, player) {
       if(err) {
-        socket.get('fbid', function(err, fbid) {
+        socket.get('fbid', function (err, fbid) {
           if(err || fbid === null) {
             socket.emit('error');
           }
@@ -180,8 +160,8 @@ io.sockets.on('connection', function (socket) {
   });
 });
 
-var addPlayerToSocket = function(fbid, socket, callback) {
-  Player.findOne({fbid: fbid}, function(error, player) {
+var addPlayerToSocket = function(fbid, name, socket, callback) {
+  Player.findOne({fbid: fbid}, function (error, player) {
     var currentPlayer = player;
 
     if(error) { // emit error to client
@@ -190,18 +170,18 @@ var addPlayerToSocket = function(fbid, socket, callback) {
     }
 
     if(currentPlayer === null) { // no player by that fbid in db yet, create one
-      currentPlayer = new Player({ fbid: fbid, time: 0 }).save(function (err) {
+      currentPlayer = new Player({ fbid: fbid, name: name, time: 0 }).save(function (err) {
         callback({err: 'there was an error'}, undefined);
       });
     }
 
-    socket.set('player', currentPlayer, function() {
+    socket.set('player', currentPlayer, function () {
       callback(undefined, currentPlayer);
     });
   });
 };
 
 // Startup server
-server.listen(app.get('port'), function() {
+server.listen(app.get('port'), function () {
   console.log("Express server listening on port " + app.get('port'));
 });

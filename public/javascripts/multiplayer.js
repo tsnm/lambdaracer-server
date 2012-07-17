@@ -1,7 +1,9 @@
 var socket = io.connect(lambdaracer.current.host_url);
 
 socket.on('connect', function (data) {
-  socket.emit('init', { fbid: lambdaracer.current.fbid });
+  console.log(lambdaracer.current.fbid);
+  console.log(lambdaracer.current.name);
+  socket.emit('init', { fbid: lambdaracer.current.fbid, name: lambdaracer.current.name });
 });
 
 socket.on('ready', function (data) {
@@ -9,6 +11,11 @@ socket.on('ready', function (data) {
 });
 
 socket.on('init', function (data) {
+  // do init stuff here, e.g. initial leader board
+});
+
+socket.on('player connected', function (name) {
+
 });
 
 socket.on('error', function (data) {
