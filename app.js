@@ -140,7 +140,7 @@ io.sockets.on('connection', function (socket) {
       if(err) {
         socket.get('fbid', function (err, fbid) {
           if(err || fbid === null) {
-            socket.emit('error', { err: err });
+            socket.emit('error', { err: "there was an error for socket.get('fbid') && fbid === null" });
           }
 
           addPlayerToSocket(fbid, socket, function (err, player) {
