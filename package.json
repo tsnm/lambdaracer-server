@@ -1,6 +1,6 @@
 {
   "name": "lambdaracer-server",
-  "version": "0.0.1-53",
+  "version": "0.0.1-79",
   "private": true,
   "subdomain": "lambda-racer",
   "author": "tsnm <tsnm.at.kllr@googlemail.com>",

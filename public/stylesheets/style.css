@@ -22,6 +22,57 @@ a {
   left: 100px;
 }
 
+#hud {
+  background-color: #FF00FF;
+  background-color: rgba(255,0,255,0.8);
+}
+
 #fps {
   display: none;
+}
+
+#info {
+  background-color: #00FFFF;
+  background-color: rgba(0,255,255,0.8);
+  position: absolute;
+  top: 92px;
+  left: 108px;
+  z-index: 1;
+  padding: 3px;
+}
+
+#info ul {
+  padding: 0;
+  margin: 0;
+  font-size: 10px;
+  list-style-type: none;
+  color: #800080;
+}
+
+#info ul li.new_info {
+  color: #F6358A;
+  font-weight: bold;
+}
+
+#leaderboard {
+  background-color: #00FFFF;
+  background-color: rgba(0,255,255,0.7);
+  position: absolute;
+  top: 92px;
+  right: 58px;
+  z-index: 1;
+  padding: 3px;
+}
+
+#leaderboard ul {
+  padding: 0;
+  margin: 0;
+  font-size: 10px;
+  list-style-type: none;
+  color: #000000;
+}
+
+#leaderboard ul li.new_record {
+  color: #F6358A;
+  font-weight: bold;
 }

@@ -1,6 +1,8 @@
 extends layout
 
 append scripts
+  script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
+  script(src='/javascripts/jquery.color.js')
   script(src='/socket.io/socket.io.js')
   script(src='/javascripts/stats.js')
   script(src='/javascripts/common.js')
@@ -13,6 +15,12 @@ block content
   #fps(style='position: absolute; top: 0; left: 0;')
   #wrap
     #info
+      span Multiplayer:
+      ul
+
+    #leaderboard
+      span Leaderboard:
+      ul
 
     #racer
       #hud

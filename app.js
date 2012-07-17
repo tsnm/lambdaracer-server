@@ -50,7 +50,7 @@ app.configure('development', function () {
 
 // Production environment
 app.configure('production', function () {
-  host_url = "//lambda-racer.jit.su/";
+  host_url = "//lambda-racer.jit.su/"; // SSL-problem when using *.jit.su? try using *.nodejitsu.com
   db_url = "mongodb://tsnm:TsuNaMi@flame.mongohq.com:27047/lambdaracer";
   redirect_url = "//www.facebook.com/lambda.maximal/app_260510290719654";
   app.use(express.errorHandler());
@@ -86,21 +86,18 @@ app.post('/signed_request', function (req, res) {
   res.send('Signed Request details: ' + require('util').inspect(req.facebook.signed_request));
 });
 
-var errOnMongoose;
 // initialize DB
-mongoose.connect(db_url, function (err) {
-  errOnMongoose = err;
-});
+mongoose.connect(db_url);
 
 // Create server and initialize socket.io
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
 // Compatibility for Heroku (commented out, while experimenting with nodejitsu)
-//io.configure(function () {
-//  io.set("transports", ["xhr-polling"]);
-//  io.set("polling duration", 10);
-//});
+/*io.configure(function () {
+  io.set("transports", ["xhr-polling"]);
+  io.set("polling duration", 10);
+});*/
 
 // Compatibility for nodejitsu
 io.configure('production', function () {
@@ -120,7 +117,13 @@ io.set('transports', [
 
 // Events to monitor
 io.sockets.on('connection', function (socket) {
-  socket.emit('init');
+  getLeaderBoardData(function (err, result) {
+    if(err) {
+      socket.emit('error', { err: err.err });
+    } else {
+      socket.emit('init', { result: result.slice(0, 10) });
+    }
+  });
 
   socket.on('init', function (data) {
     socket.set('fbid', data.fbid, function () {
@@ -128,7 +131,9 @@ io.sockets.on('connection', function (socket) {
         if(err) {
           socket.emit('error', { err: err.err });
         } else {
-          //socket.broadcast('player connected', { name: player.name  });
+          socket.emit('debug', { err: err, player: player, msg: "broadcasting 'player connected'" });
+
+          socket.broadcast.emit('player connected', { name: player.name  });
           socket.emit('ready');
         }
       });
@@ -137,8 +142,12 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('update laptime', function (data) {
     socket.get('player', function (err, player) {
+      socket.emit('debug', { err: err, player: player, msg: "getting player from socket" });
+
       if(err) {
         socket.get('fbid', function (err, fbid) {
+          socket.emit('debug', { err: err, fbid: fbid, msg: "getting fbid from socket" });
+
           if(err || fbid === null) {
             socket.emit('error', { err: "there was an error for socket.get('fbid') && fbid === null" });
           }
@@ -147,21 +156,56 @@ io.sockets.on('connection', function (socket) {
             if(err) {
               socket.emit('error', { err: err.err });
             } else {
-              player.time = data.lapTime;
-              player.save();
+              socket.emit('debug', { msg: "setting time on player freshly added to socket, again" });
+              socket.emit('debug', { data: data, player: player });
+
+              if(player.time == 0 || data.lapTime < player.time) {
+                player.time = data.lapTime;
+                player.save();
+
+                socket.broadcast.emit('new best time', { name: player.name, lapTime: data.lapTime });
+
+                getLeaderBoardData(function (err, result) {
+                  if(err) {
+                    socket.emit('error', { err: err.err });
+                  } else {
+                    socket.broadcast.emit('update leaderboard', { result: result.slice(0, 10), player: player });
+                  }
+                });
+              } else {
+                socket.broadcast.emit('new laptime', { name: player.name, lapTime: data.lapTime });
+              }
             }
           });
         });
       } else {
-        player.time = data.lapTime;
-        player.save();
+        socket.emit('debug', { msg: "setting time on player loaded from socket" });
+        socket.emit('debug', { data: data, player: player });
+
+        if(player.time == 0 || data.lapTime < player.time) {
+          player.time = data.lapTime;
+          player.save();
+
+          socket.broadcast.emit('new best time', { name: player.name, lapTime: data.lapTime });
+
+          getLeaderBoardData(function (err, result) {
+            if(err) {
+              socket.emit('error', { err: err.err });
+            } else {
+              socket.emit('update leaderboard', { result: result.slice(0, 10), player: player });
+              socket.broadcast.emit('update leaderboard', { result: result.slice(0, 10), player: player });
+            }
+          });
+        } else {
+          socket.broadcast.emit('new laptime', { name: player.name, lapTime: data.lapTime });
+        }
       }
     });
   });
 });
 
-var addPlayerToSocket = function(fbid, name, socket, callback) {
-  Player.findOne({fbid: fbid}, function (error, player) {
+var addPlayerToSocket = function (fbid, name, socket, callback) {
+  Player.findOne({ fbid: fbid }, function (error, player) {
     var currentPlayer = player;
 
     if(error) { // emit error to client
@@ -170,14 +214,31 @@ var addPlayerToSocket = function(fbid, name, socket, callback) {
     }
 
     if(currentPlayer === null) { // no player by that fbid in db yet, create one
-      currentPlayer = new Player({ fbid: fbid, name: name, time: 0 }).save(function (err) {
-        callback({err: 'there was an error for new Player().save()'}, undefined);
+      currentPlayer = new Player({ fbid: fbid, name: name, time: 0 });
+      currentPlayer.save(function (err) {
+        if(err) {
+          callback({ err: 'there was an error for new Player().save()' }, undefined);
+        }
       });
     }
 
+    socket.emit('debug', { player: currentPlayer });
     socket.set('player', currentPlayer, function () {
       callback(undefined, currentPlayer);
     });
+  });
+};
+
+var getLeaderBoardData = function (callback) {
+  Player.where('time').gt(0)
+       .where('fbid').exists()
+       .sort('time', 1)
+       .run(function(err, result) {
+    if(err) {
+      callback({ err: 'there was an error for Player.where()' }, undefined);
+    } else {
+      callback(undefined, result);
+    }
   });
 };
 
