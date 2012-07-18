@@ -264,10 +264,10 @@ var message = {
   text: "Outrun Infonachricht"
 };
 
-var sendInfoMail = function (subject, message) {
+var sendInfoMail = function (subject, body) {
   var mail = message;
-  message.subject = subject;
-  message.text = message;
+  mail.subject = subject;
+  mail.text = body;
 
   smtpTransport.sendMail(mail, function(error, response){
     // if you don't want to use this transport object anymore, uncomment following line

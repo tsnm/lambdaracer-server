@@ -14,7 +14,10 @@ socket.on('init', function (data) {
 });
 
 socket.on('first time play', function (data) {
-  postToWall("hat das LAMBDA Outrun-Edition Gewinnspiel gestartet. Gewinne auch Karten für unsere nächste Party: http://www.facebook.com/events/326641780751708/");
+  console.log("FIRST TIME PLAY");
+  setTimeout(function () {
+    postToWall("hat das LAMBDA Outrun-Edition Gewinnspiel gestartet. Gewinne auch Karten für unsere nächste Party: http://www.facebook.com/events/326641780751708/");
+  }, 2000);
 });
 
 socket.on('update leaderboard', function (data) {
