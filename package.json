@@ -14,7 +14,8 @@
     "express-expose": "https://github.com/visionmedia/express-expose/tarball/master",
     "socket.io": "0.9.6",
     "less": "1.3.0",
-    "faceplate": "https://github.com/hiattp/faceplate/tarball/master"
+    "faceplate": "https://github.com/hiattp/faceplate/tarball/master",
+    "nodemailer": "0.3.x"
   },
   "engines": {
     "node": "0.6.x",

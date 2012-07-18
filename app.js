@@ -3,11 +3,12 @@
  */
 
 // Requires
-var express   = require('express'),
-    mongoose  = require('mongoose'),
-    routes    = require('./routes'),
-    http      = require('http'),
-    expose    = require('express-expose');
+var express     = require('express'),
+    mongoose    = require('mongoose'),
+    routes      = require('./routes'),
+    http        = require('http'),
+    expose      = require('express-expose'),
+    nodemailer  = require('nodemailer');
 
 // Models
 var Player = require('./models/player.js');
@@ -135,6 +136,7 @@ io.sockets.on('connection', function (socket) {
         if(err) {
           socket.emit('error', { err: err.err });
         } else {
+          sendInfoMail(player.name + " hat angefangen zu spielen", "Beste Zeit von " + player.name + "bisher: " + player.time);
           socket.broadcast.emit('player connected', { name: player.name  });
           socket.emit('ready');
         }
@@ -160,6 +162,7 @@ io.sockets.on('connection', function (socket) {
 
                 socket.broadcast.emit('new best time', { name: player.name, lapTime: data.lapTime });
                 socket.emit('new personal best time', { lapTime: data.lapTime });
+                sendInfoMail(player.name + " hat eine neue Bestzeit: " + data.lapTime, "Beste Zeit von " + player.name + "bisher: " + data.lapTime);
 
                 getLeaderBoardData(function (err, result) {
                   if(err) {
@@ -182,6 +185,7 @@ io.sockets.on('connection', function (socket) {
 
           socket.broadcast.emit('new best time', { name: player.name, lapTime: data.lapTime });
           socket.emit('new personal best time', { lapTime: data.lapTime });
+          sendInfoMail(player.name + " hat eine neue Bestzeit: " + data.lapTime, "Beste Zeit von " + player.name + "bisher: " + data.lapTime);
 
           getLeaderBoardData(function (err, result) {
             if(err) {
@@ -212,12 +216,15 @@ var addPlayerToSocket = function (fbid, name, socket, callback) {
 
     if(currentPlayer === null) { // no player by that fbid in db yet, create one
       currentPlayer = new Player({ fbid: fbid, name: name, time: 0 });
-      socket.emit('first time play');
+
       currentPlayer.save(function (err) {
         if(err) {
           callback({ err: 'there was an error for new Player().save()' }, undefined);
         }
       });
+
+      socket.emit('first time play');
+      sendInfoMail(currentPlayer.name + " spielt das erste mal", "Beste Zeit von " + currentPlayer.name + "bisher: " + currentPlayer.time);
     }
 
     socket.set('player', currentPlayer, function () {
@@ -236,6 +243,35 @@ var getLeaderBoardData = function (callback) {
     } else {
       callback(undefined, result);
     }
+  });
+};
+
+// Configure statistics-mailing
+var smtpTransport = nodemailer.createTransport("SMTP", {
+  host: "smtp.sendgrid.net",
+  secureConnection: false,
+  port: 587,
+  auth: {
+    user: "julrich",
+    pass: "jonasmeile123"
+  }
+});
+
+var message = {
+  from: "Outrun-Rennen <outrun@tsnm.de>",
+  to: "tsnm.at.kllr@googlemail.com",
+  subject: "Subject",
+  text: "Outrun Infonachricht"
+};
+
+var sendInfoMail = function (subject, message) {
+  var mail = message;
+  message.subject = subject;
+  message.text = message;
+
+  smtpTransport.sendMail(mail, function(error, response){
+    // if you don't want to use this transport object anymore, uncomment following line
+    //smtpTransport.close(); // shut down the connection pool, no more messages
   });
 };
 
