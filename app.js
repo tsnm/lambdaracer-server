@@ -136,7 +136,7 @@ io.sockets.on('connection', function (socket) {
         if(err) {
           socket.emit('error', { err: err.err });
         } else {
-          sendInfoMail(player.name + " hat angefangen zu spielen", "Beste Zeit von " + player.name + "bisher: " + player.time);
+          sendInfoMail(player.name + " hat angefangen zu spielen", "Beste Zeit von " + player.name + " bisher: " + player.time);
           socket.broadcast.emit('player connected', { name: player.name  });
           socket.emit('ready');
         }
@@ -162,7 +162,7 @@ io.sockets.on('connection', function (socket) {
 
                 socket.broadcast.emit('new best time', { name: player.name, lapTime: data.lapTime });
                 socket.emit('new personal best time', { lapTime: data.lapTime });
-                sendInfoMail(player.name + " hat eine neue Bestzeit: " + data.lapTime, "Beste Zeit von " + player.name + "bisher: " + data.lapTime);
+                sendInfoMail(player.name + " hat eine neue Bestzeit: " + data.lapTime, "Beste Zeit von " + player.name + " bisher: " + data.lapTime);
 
                 getLeaderBoardData(function (err, result) {
                   if(err) {
@@ -185,7 +185,7 @@ io.sockets.on('connection', function (socket) {
 
           socket.broadcast.emit('new best time', { name: player.name, lapTime: data.lapTime });
           socket.emit('new personal best time', { lapTime: data.lapTime });
-          sendInfoMail(player.name + " hat eine neue Bestzeit: " + data.lapTime, "Beste Zeit von " + player.name + "bisher: " + data.lapTime);
+          sendInfoMail(player.name + " hat eine neue Bestzeit: " + data.lapTime, "Beste Zeit von " + player.name + " bisher: " + data.lapTime);
 
           getLeaderBoardData(function (err, result) {
             if(err) {
@@ -224,7 +224,7 @@ var addPlayerToSocket = function (fbid, name, socket, callback) {
       });
 
       socket.emit('first time play');
-      sendInfoMail(currentPlayer.name + " spielt das erste mal", "Beste Zeit von " + currentPlayer.name + "bisher: " + currentPlayer.time);
+      sendInfoMail(currentPlayer.name + " spielt das erste mal", "Beste Zeit von " + currentPlayer.name + " bisher: " + currentPlayer.time);
     }
 
     socket.set('player', currentPlayer, function () {
