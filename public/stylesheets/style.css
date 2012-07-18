@@ -8,10 +8,36 @@ a {
   color: #00B7FF;
 }
 
-#wrap {
-  width: 809px;
+#howto {
+  position: absolute;
+  width: 795px;
   height: 1014px;
-  border: 1px solid black;
+  background-color: black;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 20;
+}
+
+#howto .inner {
+  width: 500px;
+  margin: 0 auto;
+  color: white;
+  position: relative;
+  top: 100px;
+  font-weight: bold;
+}
+
+#howto .inner #submit {
+  width: 300px;
+  font-size: 20px;
+  margin: 0 auto;
+  display: block;
+  height: 80px;
+  line-height: 80px;
+}
+
+#wrap {
+  width: 795px;
+  height: 1014px;
   background: url('/images/arcade_bg.png') no-repeat top left;
 }
 
@@ -22,9 +48,13 @@ a {
   left: 100px;
 }
 
-#hud {
+#racer #hud {
   background-color: #FF00FF;
-  background-color: rgba(255,0,255,0.8);
+  background-color: rgba(255, 0, 255, 0.8);
+}
+
+#racer #hud .fastest {
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 #fps {
@@ -33,12 +63,14 @@ a {
 
 #info {
   background-color: #00FFFF;
-  background-color: rgba(0,255,255,0.8);
+  background-color: rgba(0, 255, 255, 0.8);
   position: absolute;
   top: 92px;
   left: 108px;
   z-index: 1;
   padding: 3px;
+  border: 1px solid black;
+  width: 160px;
 }
 
 #info ul {
@@ -55,13 +87,15 @@ a {
 }
 
 #leaderboard {
+  width: 160px;
   background-color: #00FFFF;
-  background-color: rgba(0,255,255,0.7);
+  background-color: rgba(0, 255, 255, 0.7);
   position: absolute;
   top: 92px;
-  right: 58px;
+  right: 74px;
   z-index: 1;
   padding: 3px;
+  border: 1px solid black;
 }
 
 #leaderboard ul {
@@ -75,4 +109,41 @@ a {
 #leaderboard ul li.new_record {
   color: #F6358A;
   font-weight: bold;
+}
+
+#leaderboard ul li span {
+  float: right;
+}
+
+#personalboard {
+  display: none;
+  position: absolute;
+  z-index: 20;
+  width: 276px;
+  height: 54px;
+  left: 284px;
+  top: 92px;
+  background-color: #00FF00;
+  background-color: rgba(0, 255, 0, 0.6);
+  border: 1px solid black;
+}
+
+#personalboard h1 {
+  font-size: 17px;
+  text-align: center;
+  margin: 3px 0px 0px 0px;
+  padding: 0;
+}
+
+#personalboard p {
+  font-size: 11px;
+  margin: 0;
+  padding: 0px 6px 0px 6px;
+}
+
+#sound {
+  position: absolute;
+  top: 52px;
+  left: 355px;
+  z-index: 50;
 }

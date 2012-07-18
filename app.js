@@ -20,6 +20,9 @@ var host_url, host_url_protocol,
     redirect_url, redirect_url_protocol,
     db_url;
 
+// Permissions required on Facebook
+var required_permissions = ['user_likes','publish_stream'];
+
 // Express configuration
 app.configure(function () {
   app.set('port', process.env.PORT || 1338);
@@ -31,8 +34,8 @@ app.configure(function () {
   app.use(express.cookieParser());
   app.use(express.session({ secret: "lambda racer" }));
   app.use(require('faceplate').middleware({
-    app_id: process.env.FACEBOOK_APP_ID || '260510290719654',
-    secret: process.env.FACEBOOK_SECRET || 'f7a9e6ee38d5c2f821fc4c0385f87f4d',
+    app_id: process.env.FACEBOOK_APP_ID || '260510290719654', // TODO remove from repository
+    secret: process.env.FACEBOOK_SECRET || 'f7a9e6ee38d5c2f821fc4c0385f87f4d', // TODO remove from repository
     scope: 'user_likes'
   }));
   app.use(express.methodOverride());
@@ -50,7 +53,7 @@ app.configure('development', function () {
 
 // Production environment
 app.configure('production', function () {
-  host_url = "//lambda-racer.jit.su/"; // SSL-problem when using *.jit.su? try using *.nodejitsu.com
+  host_url = "//lambda-racer.nodejitsu.com/"; // SSL-problem when using *.jit.su? try using *.nodejitsu.com
   db_url = "mongodb://tsnm:TsuNaMi@flame.mongohq.com:27047/lambdaracer";
   redirect_url = "//www.facebook.com/lambda.maximal/app_260510290719654";
   app.use(express.errorHandler());
@@ -66,9 +69,10 @@ var setAppUrl = function (req, res, next) {
     redirect_url_protocol = 'http:' + redirect_url;
   }
 
-  // Expose host_url to views
+  // Expose general data to views
   app.expose({ host_url: host_url_protocol }, 'lambdaracer.current'); // FIX, is in the code multiple times
   app.expose({ redirect_url: redirect_url_protocol }, 'lambdaracer.current'); // FIX, is in the code multiple times
+  app.expose({ required_permissions: required_permissions }, 'lambdaracer.current'); // FIX, is in the code multiple times
 
   next();
 };
@@ -131,8 +135,6 @@ io.sockets.on('connection', function (socket) {
         if(err) {
           socket.emit('error', { err: err.err });
         } else {
-          socket.emit('debug', { err: err, player: player, msg: "broadcasting 'player connected'" });
-
           socket.broadcast.emit('player connected', { name: player.name  });
           socket.emit('ready');
         }
@@ -142,12 +144,8 @@ io.sockets.on('connection', function (socket) {
 
   socket.on('update laptime', function (data) {
     socket.get('player', function (err, player) {
-      socket.emit('debug', { err: err, player: player, msg: "getting player from socket" });
-
       if(err) {
         socket.get('fbid', function (err, fbid) {
-          socket.emit('debug', { err: err, fbid: fbid, msg: "getting fbid from socket" });
-
           if(err || fbid === null) {
             socket.emit('error', { err: "there was an error for socket.get('fbid') && fbid === null" });
           }
@@ -156,14 +154,12 @@ io.sockets.on('connection', function (socket) {
             if(err) {
               socket.emit('error', { err: err.err });
             } else {
-              socket.emit('debug', { msg: "setting time on player freshly added to socket, again" });
-              socket.emit('debug', { data: data, player: player });
-
               if(player.time == 0 || data.lapTime < player.time) {
                 player.time = data.lapTime;
                 player.save();
 
                 socket.broadcast.emit('new best time', { name: player.name, lapTime: data.lapTime });
+                socket.emit('new personal best time', { lapTime: data.lapTime });
 
                 getLeaderBoardData(function (err, result) {
                   if(err) {
@@ -174,19 +170,18 @@ io.sockets.on('connection', function (socket) {
                 });
               } else {
                 socket.broadcast.emit('new laptime', { name: player.name, lapTime: data.lapTime });
+                socket.emit('new personal laptime', { lapTime: data.lapTime });
               }
             }
           });
         });
       } else {
-        socket.emit('debug', { msg: "setting time on player loaded from socket" });
-        socket.emit('debug', { data: data, player: player });
-
         if(player.time == 0 || data.lapTime < player.time) {
           player.time = data.lapTime;
           player.save();
 
           socket.broadcast.emit('new best time', { name: player.name, lapTime: data.lapTime });
+          socket.emit('new personal best time', { lapTime: data.lapTime });
 
           getLeaderBoardData(function (err, result) {
             if(err) {
@@ -198,12 +193,14 @@ io.sockets.on('connection', function (socket) {
           });
         } else {
           socket.broadcast.emit('new laptime', { name: player.name, lapTime: data.lapTime });
+          socket.emit('new personal laptime', { lapTime: data.lapTime });
         }
       }
     });
   });
 });
 
+// TODO refactor functions into their own file
 var addPlayerToSocket = function (fbid, name, socket, callback) {
   Player.findOne({ fbid: fbid }, function (error, player) {
     var currentPlayer = player;
@@ -215,6 +212,7 @@ var addPlayerToSocket = function (fbid, name, socket, callback) {
 
     if(currentPlayer === null) { // no player by that fbid in db yet, create one
       currentPlayer = new Player({ fbid: fbid, name: name, time: 0 });
+      socket.emit('first time play');
       currentPlayer.save(function (err) {
         if(err) {
           callback({ err: 'there was an error for new Player().save()' }, undefined);
@@ -222,7 +220,6 @@ var addPlayerToSocket = function (fbid, name, socket, callback) {
       });
     }
 
-    socket.emit('debug', { player: currentPlayer });
     socket.set('player', currentPlayer, function () {
       callback(undefined, currentPlayer);
     });

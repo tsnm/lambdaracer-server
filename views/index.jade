@@ -6,11 +6,60 @@ append scripts
   script(src='/socket.io/socket.io.js')
   script(src='/javascripts/stats.js')
   script(src='/javascripts/common.js')
+  script(src='/javascripts/facebook.js')
+  script(src='/javascripts/script.js')
   script(src='/javascripts/multiplayer.js')
 
 block content
   #fb-root
-  script
+  script(type='text/javascript')
+    window.fbAsyncInit = function() {
+      FB.Event.subscribe('auth.statusChange', function (response) {
+        if(response.status == 'connected') {
+          initializeFB();
+        }
+      });
+
+      FB.init({
+        appId: "260510290719654",
+        channelUrl: '//lambda-racer.nodejitsu.com/channel.html',
+        logging: true,
+        status: true,
+        cookie: false,
+        xfbml: false
+      });
+    };
+
+    // Load the SDK Asynchronously
+    (function(d){
+      var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement('script'); js.id = id; js.async = true;
+      js.src = "//connect.facebook.net/en_US/all.js";
+      ref.parentNode.insertBefore(js, ref);
+    }(document));
+
+  #howto
+    div.inner
+      h1 LAMBDA Outrun Edition-Gewinnspiel
+      p
+      | So funktionierts:<br /><br />
+      | Klicke unten auf "Rennen starten", Fragen nach Rechten musst du bestätigen um teilnehmen zu können. Wir spammen aber niemanden zu, versprochen!<br />
+      | Gefahren wird mit den Pfeiltasten, falls irgendwas nicht funktioniert stellt als erstes bitte sicher das ihr einen aktuellen Browser verwendet.<br />Falls es dann immer noch nicht geht, beschwert euch bei uns auf der Pinnwand ;).<br />
+      | (Wir empfehlen Chrome: <a href="http://www.google.de/chrome/" target="_parent">http://www.google.de/chrome/</a>. Damit funktionierts bei uns!)<br />
+      | <br />Zu gewinnen gibt es folgendes:
+
+      ul
+        li Jeder der eine Zeit unter 2 Minuten fährt, hat am Samstag freien Eintritt +1!
+        li Die besten 5, die nicht unter 2 Minuten gefahren sind, bekommen auch freien Eintritt +1!
+        li Jeder bekommt ganz viel Spass ;)
+
+      p
+      | Und damit hoffen wir einfach mal das ihr mit dem kleinen Spiel genau so viel Spass habt wie wir hatten!<br /><br />
+      | Bist Samstag, Eure LAMBDA-Crew!<br />
+      | <a href="http://www.facebook.com/events/326641780751708/" target="_blank">http://www.facebook.com/events/326641780751708/</a><br /><br />
+
+      input#submit(type='button', value='Rennen starten!')
 
   #fps(style='position: absolute; top: 0; left: 0;')
   #wrap
@@ -22,22 +71,30 @@ block content
       span Leaderboard:
       ul
 
+    #personalboard
+
+    #sound
+      audio#music
+        source(src='music/racer.ogg')
+        source(src='music/racer.mp3')
+      span#mute
+
     #racer
       #hud
         span#speed.hud
           span#speed_value.value 0
-          |  mph
+          |  km/h
 
         span#current_lap_time.hud
-          |Time: 
+          |Zeit: 
           span#current_lap_time_value.value 0.0
 
         span#last_lap_time.hud
-          |Last Lap: 
+          |Letzte Runde: 
           span#last_lap_time_value.value 0.0
 
         span#fast_lap_time.hud
-          |Fastest Lap: 
+          |Beste Runde: 
           span#fast_lap_time_value.value 0.0
 
       canvas#canvas Sorry, leider funktioniert der LAMBDA racer bei dir nicht, weil dein Browser das &lt;canvas&gt; Element nicht unterstützt!
