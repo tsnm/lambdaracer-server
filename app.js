@@ -37,7 +37,7 @@ app.configure(function () {
   app.use(require('faceplate').middleware({
     app_id: process.env.FACEBOOK_APP_ID || '260510290719654', // TODO remove from repository
     secret: process.env.FACEBOOK_SECRET || 'f7a9e6ee38d5c2f821fc4c0385f87f4d', // TODO remove from repository
-    scope: 'user_likes'
+    scope: required_permissions.join()
   }));
   app.use(express.methodOverride());
   app.use(app.router);

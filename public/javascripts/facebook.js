@@ -1,9 +1,12 @@
 var initializeFB = function () {
-	// do init stuff here
+	bindCloseButton();
 };
 
 var checkPermissions = function (callback) {
   FB.api('/me/permissions', function (response) {
+    if(!response || !response.data || !response.data[0])
+      reRequestPermissions(lambdaracer.current.required_permissions, callback);
+
     var perms = response.data[0],
         missing_perms = [];
 
@@ -40,14 +43,12 @@ var postToWall = function (message) {
   params.caption = 'Eintritt für die Party am Samstag gewinnen';
 
   FB.api('/me/feed', 'post', params, function (response) {
-    console.log(response);
     // no handling needed for now
   });
 };
 
 var attendEvent = function () {
   FB.api('/326641780751708/attending', "post", {}, function (response) {
-    console.log(response);
     // no handling needed for now
   });
 };
