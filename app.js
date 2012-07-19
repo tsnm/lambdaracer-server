@@ -99,10 +99,10 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
 // Compatibility for Heroku (commented out, while experimenting with nodejitsu)
-/*io.configure(function () {
+io.configure(function () {
   io.set("transports", ["xhr-polling"]);
   io.set("polling duration", 10);
-});*/
+});
 
 // Compatibility for nodejitsu
 io.configure('production', function () {
