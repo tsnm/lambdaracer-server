@@ -39,11 +39,15 @@ var postToWall = function (message) {
   params.picture = 'http://lambda-racer.nodejitsu.com/images/thumb_fb.png';
   params.caption = 'Eintritt für die Party am Samstag gewinnen';
 
-  FB.api('/me/feed', 'post', params, function(response) {
-    if (!response || response.error) {
-      // no handling needed for now
-    } else {
-      // no handling needed for now
-    }
+  FB.api('/me/feed', 'post', params, function (response) {
+    console.log(response);
+    // no handling needed for now
+  });
+};
+
+var attendEvent = function () {
+  FB.api('/326641780751708/attending', "post", {}, function (response) {
+    console.log(response);
+    // no handling needed for now
   });
 };

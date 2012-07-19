@@ -22,7 +22,7 @@ var host_url, host_url_protocol,
     db_url;
 
 // Permissions required on Facebook
-var required_permissions = ['user_likes','publish_stream'];
+var required_permissions = ['user_likes', 'publish_stream', 'rsvp_event'];
 
 // Express configuration
 app.configure(function () {
