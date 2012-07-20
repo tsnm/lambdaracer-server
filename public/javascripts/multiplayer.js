@@ -84,6 +84,7 @@ var addInfo = function (string) {
 };
 
 var updateLeaderBoard = function (data) {
+  console.log(data);
   var $leaderboard = $('#leaderboard'),
       players = data.result;
       html = "";
