@@ -245,7 +245,14 @@ var getLeaderBoardData = function (callback) {
       console.log("DB RESULT");
       console.log(result);
       console.log(result.length());
-      callback(undefined, result);
+
+      var mail = message;
+      mail.subject = "Anzahl Spieler";
+      mail.text = result.length();
+
+      smtpTransport.sendMail(mail, function(error, response) {
+          callback(undefined, result);
+      });
     }
   });
 };
