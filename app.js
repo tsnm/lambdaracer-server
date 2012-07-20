@@ -126,7 +126,7 @@ io.sockets.on('connection', function (socket) {
     if(err) {
       socket.emit('error', { err: err.err });
     } else {
-      socket.emit('init', { result: result.slice(0, 20) });
+      socket.emit('init', { result: result.slice(0, 20)});
     }
   });
 
