@@ -126,7 +126,7 @@ io.sockets.on('connection', function (socket) {
     if(err) {
       socket.emit('error', { err: err.err });
     } else {
-      socket.emit('init', { result: result.slice(0, 20)});
+      socket.emit('init', { result: result});
     }
   });
 
@@ -168,8 +168,8 @@ io.sockets.on('connection', function (socket) {
                   if(err) {
                     socket.emit('error', { err: err.err });
                   } else {
-                    socket.emit('update leaderboard', { result: result.slice(0, 20), player: player });
-                    socket.broadcast.emit('update leaderboard', { result: result.slice(0, 20), player: player });
+                    socket.emit('update leaderboard', { result: result, player: player });
+                    socket.broadcast.emit('update leaderboard', { result: result, player: player });
                   }
                 });
               } else {
@@ -192,8 +192,8 @@ io.sockets.on('connection', function (socket) {
             if(err) {
               socket.emit('error', { err: err.err });
             } else {
-              socket.emit('update leaderboard', { result: result.slice(0, 20), player: player });
-              socket.broadcast.emit('update leaderboard', { result: result.slice(0, 20), player: player });
+              socket.emit('update leaderboard', { result: result, player: player });
+              socket.broadcast.emit('update leaderboard', { result: result, player: player });
             }
           });
         } else {
