@@ -54,7 +54,8 @@ app.configure('development', function () {
 
 // Production environment
 app.configure('production', function () {
-  host_url = "//lambda-racer.nodejitsu.com/"; // SSL-problem when using *.jit.su? try using *.nodejitsu.com
+  // host_url = "//lambda-racer.nodejitsu.com/"; // NODEJITSU: SSL-problem when using *.jit.su? try using *.nodejitsu.com
+  host_url = "//dry-wave-4817.herokuapp.com/";
   db_url = "mongodb://tsnm:TsuNaMi@flame.mongohq.com:27047/lambdaracer";
   redirect_url = "//www.facebook.com/lambda.maximal/app_260510290719654";
   app.use(express.errorHandler());
@@ -122,7 +123,28 @@ io.set('transports', [
 
 // Events to monitor
 io.sockets.on('connection', function (socket) {
+  getLeaderBoardData(function (err, result) {
+    if(err) {
+      socket.emit('error', { err: err.err });
+    } else {
+      socket.emit('debug', { result_length: result.length(), result: result });
+      socket.emit('init', { result: result});
+    }
+  });
 
+  socket.on('init', function (data) {
+    socket.set('fbid', data.fbid, function () {
+      addPlayerToSocket(data.fbid, data.name, socket, function (err, player) {
+        if(err) {
+          socket.emit('error', { err: err.err });
+        } else {
+          sendInfoMail(player.name + " hat angefangen zu spielen", "Beste Zeit von " + player.name + " bisher: " + player.time);
+          socket.broadcast.emit('player connected', { name: player.name  });
+          socket.emit('ready');
+        }
+      });
+    });
+  });
 
   socket.on('update laptime', function (data) {
     socket.get('player', function (err, player) {
