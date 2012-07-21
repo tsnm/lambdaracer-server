@@ -278,9 +278,25 @@ var Render = {
     var sourceY = layer.y
     var sourceW = Math.min(imageW, layer.x+layer.w-sourceX);
     var sourceH = imageH;
-    
+
     var destX = 0;
-    var destY = offset;
+
+    var destY;
+    // tsnm hacked in beat-sync
+    if(layer === BACKGROUND.SKY) {
+      destY = offset + beatOffset - 30;
+      if(beatOffset > 0)
+        beatOffset--;
+    } else if(layer === BACKGROUND.BEATSKY) {
+      destY = offset + beatOffset - 162 ;
+      if(beatOffset > 0)
+        beatOffset--;
+    } else if(layer === BACKGROUND.TREES || layer === BACKGROUND.BEATTREES) {
+      destY = offset - beatOffset/2;
+    } else {
+      destY = offset;
+    }
+
     var destW = Math.floor(width * (sourceW/imageW));
     var destH = height;
 
@@ -364,9 +380,11 @@ var COLORS = {
 };
 
 var BACKGROUND = {
-  HILLS: { x:   5, y:   5, w: 1280, h: 480 },
-  SKY:   { x:   5, y: 495, w: 1280, h: 480 },
-  TREES: { x:   5, y: 985, w: 1280, h: 480 }
+  HILLS:      { x:   5, y:   5,  w: 1280, h: 480 },
+  SKY:        { x:   5, y: 495,  w: 1280, h: 480 },
+  TREES:      { x:   5, y: 985,  w: 1280, h: 480 },
+  BEATSKY:    { x:   5, y: 1475, w: 1280, h: 580 },
+  BEATTREES:  { x:   5, y: 2065, w: 1280, h: 480 }
 };
 
 var SPRITES = {

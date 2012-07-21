@@ -253,9 +253,19 @@ function render() {
 
   ctx.clearRect(0, 0, width, height);
 
-  Render.background(ctx, background, width, height, BACKGROUND.SKY,   skyOffset,  resolution * skySpeed  * playerY);
+  if(beatOffset > 90) {
+    Render.background(ctx, background, width, height, BACKGROUND.BEATSKY,   skyOffset,  resolution * skySpeed  * playerY);
+  } else {
+    Render.background(ctx, background, width, height, BACKGROUND.SKY,   skyOffset,  resolution * skySpeed  * playerY);
+  }
+
   Render.background(ctx, background, width, height, BACKGROUND.HILLS, hillOffset, resolution * hillSpeed * playerY);
-  Render.background(ctx, background, width, height, BACKGROUND.TREES, treeOffset, resolution * treeSpeed * playerY);
+
+  if(beatOffset > 90) {
+    Render.background(ctx, background, width, height, BACKGROUND.BEATTREES, treeOffset, resolution * treeSpeed * playerY);
+  } else {
+    Render.background(ctx, background, width, height, BACKGROUND.TREES, treeOffset, resolution * treeSpeed * playerY);
+  }
 
   var n, i, segment, car, sprite, spriteScale, spriteX, spriteY;
 

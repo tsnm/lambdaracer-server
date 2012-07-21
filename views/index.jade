@@ -73,12 +73,6 @@ block content
 
     #personalboard
 
-    #sound
-      audio#music
-        source(src='music/racer.ogg')
-        source(src='music/racer.mp3')
-      span#mute
-
     #racer
       #hud
         span#speed.hud
@@ -101,3 +95,10 @@ block content
       | Loading...
 
   script(src='/javascripts/racer.js')
+  script(src='/music/dancer.js')
+  script(src='/music/beat.js')
+  script(src='/music/adapterWebkit.js')
+  script(src='/music/adapterMoz.js')
+  script(src='/music/adapterFlash.js')
+  script(src='/music/flash_detect.js')
+  script(src='/javascripts/music.js')
