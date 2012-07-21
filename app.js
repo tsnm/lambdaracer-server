@@ -122,28 +122,7 @@ io.set('transports', [
 
 // Events to monitor
 io.sockets.on('connection', function (socket) {
-  getLeaderBoardData(function (err, result) {
-    if(err) {
-      socket.emit('error', { err: err.err });
-    } else {
-      socket.emit('debug', { result_length: result.length(), result: result });
-      socket.emit('init', { result: result});
-    }
-  });
 
-  socket.on('init', function (data) {
-    socket.set('fbid', data.fbid, function () {
-      addPlayerToSocket(data.fbid, data.name, socket, function (err, player) {
-        if(err) {
-          socket.emit('error', { err: err.err });
-        } else {
-          sendInfoMail(player.name + " hat angefangen zu spielen", "Beste Zeit von " + player.name + " bisher: " + player.time);
-          socket.broadcast.emit('player connected', { name: player.name  });
-          socket.emit('ready');
-        }
-      });
-    });
-  });
 
   socket.on('update laptime', function (data) {
     socket.get('player', function (err, player) {
