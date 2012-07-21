@@ -26,7 +26,6 @@ var bindCloseButton = function () {
 
       checkPermissions(function () {
         $('#howto').hide();
-        console.log(window.addInfo);
         addInfo('Du hast ein Rennen gestartet!');
         window.scrollTo(0, 0);
 
