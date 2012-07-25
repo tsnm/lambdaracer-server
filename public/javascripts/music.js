@@ -1,4 +1,4 @@
-var beatOffset = 0;
+var beatOffset = 0; // used for manipulating sprite-positions based on beat
 
 (function () {
   var
@@ -19,20 +19,15 @@ var beatOffset = 0;
     offBeat: function () {
     }
   }).on();
-  //dancer.fft( fft, { fillStyle: '#666' });
 
   Dancer.isSupported() || loaded();
   !dancer.isLoaded() ? dancer.bind( 'loaded', loaded ) : loaded();
-
-  /*
-   * Loading
-   */
 
   function loaded () {
     var supported = Dancer.isSupported();
 
     if (supported) {
-		  dancer.play();
+      dancer.play();
     }
   }
 

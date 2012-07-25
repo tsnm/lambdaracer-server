@@ -22,7 +22,7 @@ var host_url, host_url_protocol,
     db_url;
 
 // Permissions required on Facebook
-var required_permissions = ['user_likes', 'publish_stream', 'rsvp_event'];
+var required_permissions = ['user_likes'];
 
 // Express configuration
 app.configure(function () {
@@ -113,13 +113,13 @@ io.configure('production', function () {
   io.set('log level', 1);                    // reduce logging
 });
 
-io.set('transports', [
+/* io.set('transports', [
   'websocket',
-  //'flashsocket' // not supported on nodejitsu
+  'flashsocket' // not supported on nodejitsu
   'htmlfile',
   'xhr-polling',
   'jsonp-polling'
-]);
+]);*/  // not supported on heroku
 
 // Events to monitor
 io.sockets.on('connection', function (socket) {
@@ -137,7 +137,7 @@ io.sockets.on('connection', function (socket) {
         if(err) {
           socket.emit('error', { err: err.err });
         } else {
-          // sendInfoMail(player.name + " hat angefangen zu spielen", "Beste Zeit von " + player.name + " bisher: " + player.time);
+          sendInfoMail(player.name + " hat angefangen zu spielen", "Beste Zeit von " + player.name + " bisher: " + player.time);
           socket.broadcast.emit('player connected', { name: player.name  });
           socket.emit('ready');
         }

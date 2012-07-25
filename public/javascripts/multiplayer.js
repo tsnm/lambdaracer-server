@@ -44,15 +44,13 @@ socket.on('new personal best time', function (data) {
   if(data.lapTime < 120) {
     updatePersonalBoard(
       "EINTRITT FREI!",
-      "Das war unter 2 Minuten, meld dich einfach mit Namen an der Kasse am Samstag!"
+      "Das war unter 2 Minuten, damit wärste am 21.07. umsonst drin gewesen, schade! ;)"
     );
-    postToWall("hat sich gerade mit einer Rundenzeit von " + formatTime(data.lapTime) + " freien Eintritt auf unserer Party ( http://www.facebook.com/events/326641780751708/ ) am Samstag erkämpft!");
   } else {
     updatePersonalBoard(
       "Neue persönliche Bestzeit!",
-      "Jetzt noch unter 2.00.0 kommen, und der Eintritt ist garantiert frei!"
+      "Jetzt noch unter 2.00.0 kommen, und der Eintritt am 21.07. wäre frei gewesen! ;)"
     );
-    postToWall("hat gerade mit " + formatTime(data.lapTime) + " eine neue persönliche Bestzeit beim LAMBDA Renn- / Gewinnspiel für unsere nächste Party ( http://www.facebook.com/events/326641780751708/ ) aufgestellt!");
   }
 });
 
