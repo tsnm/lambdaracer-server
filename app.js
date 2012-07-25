@@ -99,13 +99,8 @@ mongoose.connect(db_url);
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
-// Compatibility for Heroku (commented out, while experimenting with nodejitsu)
-io.configure(function () {
-  io.set("transports", ["xhr-polling"]);
-  io.set("polling duration", 10);
-});
-
-// Compatibility for nodejitsu
+// Advised Socket.io production configuration minus ETag, no clue about ETag
+// https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
 io.configure('production', function () {
   io.enable('browser client minification');  // send minified client
 //  io.enable('browser client etag');          // apply etag caching logic based on version number
@@ -113,13 +108,21 @@ io.configure('production', function () {
   io.set('log level', 1);                    // reduce logging
 });
 
+// Transports-Stack for Nodejitsu, flashsocket not supported according to IRC (17.07.2012)
 /* io.set('transports', [
   'websocket',
   'flashsocket' // not supported on nodejitsu
   'htmlfile',
   'xhr-polling',
   'jsonp-polling'
-]);*/  // not supported on heroku
+]);*/
+
+// Transports-Stack for Heroku, only XHR-polling supported
+// https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
+io.configure(function () {
+  io.set("transports", ["xhr-polling"]);
+  io.set("polling duration", 10);
+});
 
 // Events to monitor
 io.sockets.on('connection', function (socket) {
